@@ -9,7 +9,7 @@ type ReleaseActionEntry = Entity & {
   [key: string]: Attribute.Any;
 };
 
-export interface ReleaseAction {
+export interface ReleaseAction extends Entity {
   type: 'publish' | 'unpublish';
   entry: ReleaseActionEntry;
   contentType: Common.UID.ContentType;
@@ -17,7 +17,7 @@ export interface ReleaseAction {
 }
 
 /**
- * POST /content-releases/:id/actions - Create a release action
+ * POST /content-releases/:releaseId/actions - Create a release action
  */
 export declare namespace CreateReleaseAction {
   export interface Request {
@@ -36,5 +36,22 @@ export declare namespace CreateReleaseAction {
   export interface Response {
     data: ReleaseAction;
     error?: errors.ApplicationError | errors.ValidationError | errors.NotFoundError;
+  }
+}
+
+/**
+ * DELETE /content-releases/:releaseId/actions/:actionId - Delete a release action
+ */
+
+export declare namespace DeleteReleaseAction {
+  export interface Request {
+    params: {
+      actionId: ReleaseAction['id'];
+    };
+  }
+
+  export interface Response {
+    data: ReleaseAction;
+    error?: errors.ApplicationError | errors.NotFoundError;
   }
 }

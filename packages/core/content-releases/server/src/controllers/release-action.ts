@@ -1,6 +1,9 @@
 import type Koa from 'koa';
 import { validateReleaseActionCreateSchema } from './validation/release-action';
-import type { CreateReleaseAction } from '../../../shared/contracts/release-actions';
+import type {
+  CreateReleaseAction,
+  DeleteReleaseAction,
+} from '../../../shared/contracts/release-actions';
 import { getService } from '../utils';
 
 const releaseActionController = {
@@ -15,6 +18,15 @@ const releaseActionController = {
 
     ctx.body = {
       data: releaseAction,
+    };
+  },
+  async delete(ctx: Koa.Context) {
+    const actionId: DeleteReleaseAction.Request['params']['actionId'] = ctx.params.actionId;
+
+    const deletedReleaseAction = await getService('release', { strapi }).deleteAction(actionId);
+
+    ctx.body = {
+      data: deletedReleaseAction,
     };
   },
 };
