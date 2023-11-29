@@ -22,8 +22,6 @@ describe('Release Action controller', () => {
     });
 
     it('throws an error given bad request arguments', () => {
-      // Mock permitted user
-      global.strapi.admin.services.role.hasSuperAdminRole.mockReturnValue(true);
       // Mock content type
       global.strapi.contentType = jest.fn().mockReturnValue({
         options: {
@@ -64,6 +62,26 @@ describe('Release Action controller', () => {
 
       // @ts-expect-error Ignore missing properties
       expect(() => releaseActionController.create(ctx)).rejects.toThrow('type is a required field');
+    });
+  });
+  describe('update', () => {
+    it('throws an error given bad request arguments', () => {
+      const ctx = {
+        params: {
+          actionId: 1,
+        },
+        request: {
+          // Mock missing type property
+          body: {
+            type: 'ffff',
+          },
+        },
+      };
+
+      // @ts-expect-error Ignore missing properties
+      expect(() => releaseActionController.update(ctx)).rejects.toThrow(
+        'type must be one of the following values: publish, unpublish'
+      );
     });
   });
 });

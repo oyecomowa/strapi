@@ -1,8 +1,16 @@
 import { setCreatorFields, errors } from '@strapi/utils';
 import type { LoadedStrapi } from '@strapi/types';
 import { RELEASE_ACTION_MODEL_UID, RELEASE_MODEL_UID } from '../constants';
-import type { GetReleases, CreateRelease, UpdateRelease, GetRelease } from '../../../shared/contracts/releases';
-import type { CreateReleaseAction } from '../../../shared/contracts/release-actions';
+import type {
+  GetReleases,
+  CreateRelease,
+  UpdateRelease,
+  GetRelease,
+} from '../../../shared/contracts/releases';
+import type {
+  CreateReleaseAction,
+  UpdateReleaseAction,
+} from '../../../shared/contracts/release-actions';
 import type { UserInfo } from '../../../shared/types';
 import { getService } from '../utils';
 
@@ -35,11 +43,17 @@ const createReleaseService = ({ strapi }: { strapi: LoadedStrapi }) => ({
       },
     });
   },
-  async update(id: number, releaseData: UpdateRelease.Request['body'], { user }: { user: UserInfo }) {
+  async update(
+    id: number,
+    releaseData: UpdateRelease.Request['body'],
+    { user }: { user: UserInfo }
+  ) {
     const updatedRelease = await setCreatorFields({ user, isEdition: true })(releaseData);
 
-    // @ts-expect-error Type 'ReleaseUpdateArgs' has no properties in common with type 'Partial<Input<"plugin::content-releases.release">>'
-    const release = await strapi.entityService.update(RELEASE_MODEL_UID, id, { data: updatedRelease });
+    const release = await strapi.entityService.update(RELEASE_MODEL_UID, id, {
+      // @ts-expect-error Type 'ReleaseUpdateArgs' has no properties in common with type 'Partial<Input<"plugin::content-releases.release">>'
+      data: updatedRelease,
+    });
 
     if (!release) {
       throw new errors.NotFoundError(`No release found for id ${id}`);
@@ -75,6 +89,25 @@ const createReleaseService = ({ strapi }: { strapi: LoadedStrapi }) => ({
       },
       populate: { release: { fields: ['id'] }, entry: { fields: ['id'] } },
     });
+  },
+  async updateAction(
+    id: UpdateReleaseAction.Request['params']['actionId'],
+    update: UpdateReleaseAction.Request['body']
+  ) {
+    const updatedAction = await strapi.entityService.update(RELEASE_ACTION_MODEL_UID, id, {
+      /**
+       * Type 'ReleaseUpdateArgs' has no properties in common with type 'Partial<Input<"plugin::content-releases.release">>'
+       * The Partial type from the entity service does not seem to be returning the value since ReleaseUpdateArgs satisfies that type
+       */
+      // @ts-expect-error see above
+      data: update,
+    });
+
+    if (!updatedAction) {
+      throw new errors.NotFoundError(`No action found for action id ${id}`);
+    }
+
+    return updatedAction;
   },
 });
 

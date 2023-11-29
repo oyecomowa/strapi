@@ -1,6 +1,12 @@
 import type Koa from 'koa';
-import { validateReleaseActionCreateSchema } from './validation/release-action';
-import type { CreateReleaseAction } from '../../../shared/contracts/release-actions';
+import {
+  validateReleaseActionCreateSchema,
+  validateReleaseActionUpdateSchema,
+} from './validation/release-action';
+import type {
+  CreateReleaseAction,
+  UpdateReleaseAction,
+} from '../../../shared/contracts/release-actions';
 import { getService } from '../utils';
 
 const releaseActionController = {
@@ -15,6 +21,19 @@ const releaseActionController = {
 
     ctx.body = {
       data: releaseAction,
+    };
+  },
+  async update(ctx: Koa.Context) {
+    const actionId: UpdateReleaseAction.Request['params']['actionId'] = ctx.params.actionId;
+    const releaseActionUpdateArgs: UpdateReleaseAction.Request['body'] = ctx.request.body;
+
+    await validateReleaseActionUpdateSchema(releaseActionUpdateArgs);
+
+    const releaseService = getService('release', { strapi });
+    const updatedAction = await releaseService.updateAction(actionId, releaseActionUpdateArgs);
+
+    ctx.body = {
+      data: updatedAction,
     };
   },
 };
