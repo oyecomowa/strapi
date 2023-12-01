@@ -135,7 +135,7 @@ paths:
     post:
       tags:
         - Users-Permissions - Auth
-      summary: Send rest password email
+      summary: Send reset password email
       requestBody:
         required: true
         content:
@@ -168,7 +168,7 @@ paths:
     post:
       tags:
         - Users-Permissions - Auth
-      summary: Rest user password
+      summary: Reset user password
       requestBody:
         required: true
         content:
